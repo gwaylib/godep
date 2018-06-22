@@ -267,8 +267,8 @@ func (c *Ctx) ImportForAbs(path string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to find import path")
 	}
-	if absPath == absGoSpace {
-		path = absPath + "/default"
+	if absPath == filepath.Join(absGoSpace, "src") {
+		path = filepath.Join(absPath, "default")
 	} else if len(path) <= len(srcprefix) {
 		return "", errors.New("dep does not currently support using GOPATH/src as the project root")
 	}
