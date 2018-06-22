@@ -256,15 +256,15 @@ func (c *Ctx) ImportForAbs(path string) (string, error) {
 		return "", errors.Wrap(err, "failed to find import path")
 	}
 	if isPrefix {
-		slash := "default"
-		if len(path) > len(srcprefix) {
-			// return "", errors.New("dep does not currently support using GOPATH/src as the project root")
-			slash = path[len(srcprefix):]
+		if path == os.Getenv("PJ_ROOT") {
+			path = path + "/default"
+		} else if len(path) <= len(srcprefix) {
+			return "", errors.New("dep does not currently support using GOPATH/src as the project root")
 		}
 
 		// filepath.ToSlash because we're dealing with an import path now,
 		// not an fs path
-		return filepath.ToSlash(slash), nil
+		return filepath.ToSlash(path[len(srcprefix):]), nil
 	}
 
 	return "", errors.Errorf("%s is not within any GOPATH/src", path)
