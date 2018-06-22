@@ -255,19 +255,27 @@ func (c *Ctx) ImportForAbs(path string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to find import path")
 	}
-	if isPrefix {
-		if path == os.Getenv("PJ_ROOT") {
-			path = path + "/default"
-		} else if len(path) <= len(srcprefix) {
-			return "", errors.New("dep does not currently support using GOPATH/src as the project root")
-		}
-
-		// filepath.ToSlash because we're dealing with an import path now,
-		// not an fs path
-		return filepath.ToSlash(path[len(srcprefix):]), nil
+	if !isPrefix {
+		return "", errors.Errorf("%s is not within any GOPATH/src", path)
 	}
 
-	return "", errors.Errorf("%s is not within any GOPATH/src", path)
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to find import path")
+	}
+	absGoSpace, err := filepath.Abs(os.Getenv("GOSPACE"))
+	if err != nil {
+		return "", errors.Wrap(err, "failed to find import path")
+	}
+	if absPath == absGoSpace {
+		path = absPath + "/default"
+	} else if len(path) <= len(srcprefix) {
+		return "", errors.New("dep does not currently support using GOPATH/src as the project root")
+	}
+
+	// filepath.ToSlash because we're dealing with an import path now,
+	// not an fs path
+	return filepath.ToSlash(path[len(srcprefix):]), nil
 }
 
 // AbsForImport returns the absolute path for the project root
