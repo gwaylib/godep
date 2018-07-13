@@ -263,7 +263,7 @@ func (c *Ctx) ImportForAbs(path string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to find import path")
 	}
-	absGoSpace, err := filepath.Abs(os.Getenv("GOSPACE"))
+	absGoSpace, err := filepath.Abs(os.Getenv("PRJ_ROOT"))
 	if err != nil {
 		return "", errors.Wrap(err, "failed to find import path")
 	}
