@@ -17,6 +17,7 @@ import (
 	"sync"
 
 	"github.com/armon/go-radix"
+	"github.com/gwaylib/goget/gometa"
 	"github.com/pkg/errors"
 )
 
@@ -843,6 +844,11 @@ func doFetchMetadata(ctx context.Context, scheme, path string) (io.ReadCloser, e
 	url := fmt.Sprintf("%s://%s?go-get=1", scheme, path)
 	switch scheme {
 	case "https", "http":
+		// 检查本地是否有goget重定向, 若有，直接使用
+		if b := gometa.Local(path); b != nil {
+			return b, nil
+		}
+
 		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
 			return nil, errors.Wrapf(err, "unable to build HTTP request for URL %q", url)
